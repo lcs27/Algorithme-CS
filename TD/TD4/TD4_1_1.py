@@ -1,5 +1,5 @@
 # Question 1
-stock=[('leMonde',2),('leFigaro',1),('laLibération',4),('lesEchos',3),('lEquipe',5)]
+stock=[['leMonde',2],['leFigaro',1],['laLibération',4],['lesEchos',3],['lEquipe',5]]
 
 # Question 2
 def get(journal):
@@ -27,15 +27,16 @@ def add(journal,quantity):
     stock.append((journal,quantity))
 
 # Question 4
-def del(journal):
+def delete(journal):
     #Compléxité en O(n)
     global stock
-    
-    for i=1:len(stock):
+    stop=len(stock)
+    for i in range(len(stock)):
         #Compléxité en O(n)
         if stock[i][0]==journal:
+            stop=i
             break
-    for j=i:len(stock):
+    for j in range(stop-1,len(stock)):
         #Compléxité en O(n)
         stock[j]=stock[j+1]
 

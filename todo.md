@@ -9,4 +9,7 @@ MAJ 10h00 11/12/2020
 - CM4： mise en code des algos
 - TD3: Résumé
 - TD3 APRES: Pratique et Exos à finir
-- CM5: révsion et structure mise en code des algos
+- CM5: mise en code des algos
+- TD4: Refaire
+- TD4 APRES: Pratique et Exos à finir
+- CM6: mise en code des algos

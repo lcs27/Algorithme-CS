@@ -4,15 +4,15 @@ from graph_utiles import *
 def krustal_arborescences(graph):
 
     #### Initialisation O(|V|)
-    max = len(graph.vortex)-1 # O(1)
+    max = len(graph.getvortex())-1 # O(1)
     MST=[] # O(1)
     forest=[] # Represent by arborescences, see https://fr.wikipedia.org/wiki/Union-find
-    for v in graph.vortex: # O(1)*|V|
+    for v in graph.getvortex(): # O(1)*|V|
         forest.append(v)
     
     #### Sort of edges O(Elog(E))
     cpt = 0
-    sort = sort_by_weight(graph.edges) # O(Elog(E))
+    sort = sort_by_weight(graph.getedges()) # O(Elog(E))
 
     for edge in sort: 
         u=edge[0]

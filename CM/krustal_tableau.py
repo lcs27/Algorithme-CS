@@ -4,15 +4,15 @@ from graph_utiles import *
 def krustal_tableau(graph):
 
     #### Initialisation O(|V|)
-    max = len(graph.vortex)-1 # O(1)
+    max = len(graph.getvortex())-1 # O(1)
     MST=[] # O(1)
     forest=[] # Represent by krustal table, O(1)
-    for i in range(len(graph.vortex)): # O(1)*|V|
+    for i in range(len(graph.getvortex())): # O(1)*|V|
         forest.append(i) 
     
     #### Sort of edges O(Elog(E))
     cpt = 0
-    sort = sort_by_weight(graph.edges) # O(Elog(E))
+    sort = sort_by_weight(graph.getedges()) # O(Elog(E))
 
     
     for edge in sort: 

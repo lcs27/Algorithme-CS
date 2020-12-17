@@ -48,3 +48,6 @@ class Tas:
 
         self.tas.pop(-1)
         return minimum
+    
+    def len(self):
+        return len(self.tas)

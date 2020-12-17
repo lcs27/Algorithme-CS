@@ -1,30 +1,29 @@
 from tas import Tas
 from graph_utiles import *
 
-def krustal_tableau(graph):
+def krustal_arborescences(graph):
 
     #### Initialisation O(|V|)
     max = len(graph.vortex)-1 # O(1)
     MST=[] # O(1)
-    forest=[] # Represent by krustal table, O(1)
-    for i in range(len(graph.vortex)): # O(1)*|V|
-        forest.append(i) 
+    forest=[] # Represent by arborescences, see https://fr.wikipedia.org/wiki/Union-find
+    for v in graph.vortex: # O(1)*|V|
+        forest.append(v)
     
     #### Sort of edges O(Elog(E))
     cpt = 0
     sort = sort_by_weight(graph.edges) # O(Elog(E))
 
-    
     for edge in sort: 
         u=edge[0]
         v=edge[1]
-        #### Determination of indices: O(1)*2E=O(E)
+        #### Determination of indices: O(log(V))*E=O(Elog(V))
         if find_tree(u,forest) != find_tree(v,forest): 
 
 
-            #### Fusion of tree O(V)*(V-1)=O(V^2)
+            #### Fusion of tree O(log(V))*(V-1)=O(Vlog(V))
             MST.append((u,v)) # O(1)
-            forest = merge_trees(u,v,forest) # O(V)
+            forest = merge_trees(u,v,forest) # O(log(V))
 
             # O(1)
             cpt += 1
@@ -34,8 +33,13 @@ def krustal_tableau(graph):
     return MST
 
 def find_tree(u,forest):
-    # O(1)
-    return forest[u]
+    # O(1) for each, with depth O(log(V))
+    if forest[u] == u:
+        return u
+    else:
+        forest[u] = find_tree(forest[u],forest)
+        return forest[u]
+        
 
 def sort_by_weight(edges):
     # sort by tas, O(Elog(E))
@@ -55,11 +59,11 @@ def sort_by_weight(edges):
     return sort
 
 def merge_trees(u,v,forest):
-    # O(V)
-    x=min(forest[u],forest[v]) # O(1)
-    for i in range(len(forest)): # O(1)*V
-        if forest[i] == forest[u] or  forest[i] == forest[v]:
-            forest[i] = x
+    #O(log(V))
+    fu = find_tree(u,forest) #O(log(V))
+    fv = find_tree(v,forest) #O(log(V))
+    if fu != fv:
+        forest[fu]=fv #O(1)
     return forest
 
 def compare_edge(edge1,edge2):
@@ -71,4 +75,4 @@ def compare_edge(edge1,edge2):
 
 if __name__ == '__main__':
     graph = graph_test_krustal()
-    print(krustal_tableau(graph))
+    print(krustal_arborescences(graph))

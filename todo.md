@@ -12,3 +12,4 @@ MAJ 10h00 11/12/2020
 - CM5: mise en code des algos
 - TD4 APRES: Pratique et Exos à finir
 - CM6: mise en code des algos
+aa

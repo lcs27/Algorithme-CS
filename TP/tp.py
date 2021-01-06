@@ -251,22 +251,22 @@ def voisins(node_combi):
 def combi_gen(candidates):
     frontier=[([],candidates)]
     while len(frontier)>0:
-        a=frontier.pop(0)
+        a=frontier.pop(-1) # Parcours en profondeur
         for i,j in voisins(a):
             frontier.append((i.copy(),j.copy()))
-            yield i
+        yield a[0]
 
 #################################################### Question 10 ###################################################
 def combi_gen_k(candidates,k=1):
     frontier=[([],candidates)]
     while len(frontier)>0:
-        a=frontier.pop(0)
+        a=frontier.pop(0)# Parcours en largeur
         for i,j in voisins(a):
             frontier.append((i.copy(),j.copy()))
-            if len(i) == k:
-                yield i
-            elif len(i) > k:
-                break
+        if len(a[0]) == k:
+            yield a[0]
+        elif len(a[0]) > k:
+            break
 ################################################# Check Functions ##################################################
 # This part is given by the professor.
 
@@ -373,5 +373,5 @@ if __name__=="__main__":
     #Q_6()
     #Q_7()
     #Q_8()
-    #Q_9()
+    Q_9()
     Q_10()

@@ -13,3 +13,6 @@ Le contenu de TD
 ## Exo2
 - Complémentation de pile(FIFO) et tas-min
 - Tas de pile et utilisation
+# TD5
+
+# TD6

@@ -14,3 +14,6 @@ MAJ 23h00 17/12/2020
 - CM6: mise en code des algos
 - TD5: Revision
 - TD5 APRES: Pratique et Exos à finir
+- CM7&8: mise en code des algos
+- TD6:
+- TD6 APRES: Pratique et Exos à finir

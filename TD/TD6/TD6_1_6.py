@@ -2,7 +2,7 @@ from utils import *
 import matplotlib.pyplot as plt
 from timeit import timeit
 from random import randint
-from TD6_1_3 import *
+from TD6_1_3 import backtracking
 def branchbound(O_dict, W) :    
     global bestSol, objs_list
  

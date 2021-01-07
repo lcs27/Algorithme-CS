@@ -1,19 +1,13 @@
 Voici les choses à finir:
-MAJ 23h00 17/12/2020
-- CM1&2: éxecuter les codes, tests et recourir, regarder la preuve et synthétiser
+MAJ 21h00 7/12021
 - TD1: Exo2.2 partie récursive à finir, Exo 3 à finir, Résumé
-- TD1 APRES: Pratique et Exos à finir
-- CM3: mise en code des algos d'arbre couvrant mini. Compréhension de complexité et d'exemple fini.
 - TD2: Mise en code de TD2.1.2, TD2.1.4 avec algo Prim et algo Krustal, Résumé
-- TD2 APRES: Pratique et Exos à finir
-- CM4： mise en code des algos
 - TD3: Résumé
-- TD3 APRES: Pratique et Exos à finir
-- CM5: mise en code des algos
-- TD4 APRES: Pratique et Exos à finir
-- CM6: mise en code des algos
 - TD5: Revision
+
+- TD1 APRES: Pratique et Exos à finir
+- TD2 APRES: Pratique et Exos à finir
+- TD3 APRES: Pratique et Exos à finir
+- TD4 APRES: Pratique et Exos à finir
 - TD5 APRES: Pratique et Exos à finir
-- CM7&8: mise en code des algos
-- TD6:
 - TD6 APRES: Pratique et Exos à finir

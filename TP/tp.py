@@ -4,6 +4,7 @@ import math
 from heapq import *
 import matplotlib.pyplot as plt
 from timeit import timeit
+from itertools import * 
 
 #################################################### Introduction ####################################################
 # read the map file
@@ -75,7 +76,6 @@ def random_grid_map (n, step):
             map[f'{i+1}_{j}']['next'][f'{i}_{j}'] = d
  
     return map
-
 
 #################################################### Question 1 ####################################################
 def random_dense_map(n, d_max):
@@ -239,7 +239,7 @@ def all_combis_k(candidates,k):
 #################################################### Question 8 ####################################################
 def voisins(node_combi):
     choisi=node_combi[0]
-    candidat=node_combi[1]
+    candidat=node_combi[1].copy()
     while len(candidat)>0:
         i=candidat.pop()
         choisi.append(i)
@@ -260,13 +260,203 @@ def combi_gen(candidates):
 def combi_gen_k(candidates,k=1):
     frontier=[([],candidates)]
     while len(frontier)>0:
-        a=frontier.pop(0)# Parcours en largeur
-        for i,j in voisins(a):
-            frontier.append((i.copy(),j.copy()))
+        a=frontier.pop() # Parcours en profondeur
         if len(a[0]) == k:
             yield a[0]
-        elif len(a[0]) > k:
-            break
+            continue #
+        for i,j in voisins(a):
+            frontier.append((i.copy(),j.copy()))
+# Parcours en largeur n'est pas meilleur comme pop(0) va faire bouger.
+
+################################################### Configuration ###################################################
+toy_distance_dict = all_distances(toy_map)
+france = read_map('france_lite.map')
+france_distance_dict = all_distances(france)
+#################################################### Question 11 ###################################################
+def closest_hospital(city, hospitals, distance_dict):
+    hospital_choosen = min(hospitals, key=lambda i: distance_dict[(city,i)])
+    hospital_distance = distance_dict[(city,hospital_choosen)]
+    return (hospital_distance,hospital_choosen)
+    
+#################################################### Question 12 ###################################################
+def kcentre_value(map, hospitals, distance_dict):
+    hospital_biggest_distance = 0
+    for i in map.keys():
+        k=closest_hospital(i,hospitals,distance_dict)[0]
+        hospital_biggest_distance = max(k, hospital_biggest_distance)
+    return hospital_biggest_distance
+            
+#################################################### Question 13 ###################################################
+def brute_force(map, candidates, k, distance_dict) :
+    smallest_distance = math.inf
+    smallest_combi = None
+    for i in combi_gen_k(candidates,k):
+        distance = kcentre_value(map,i,distance_dict)
+        if distance < smallest_distance:
+            smallest_distance = distance
+            smallest_combi = set(i)
+    return (smallest_distance,smallest_combi)
+
+#################################################### Question 14 ###################################################
+def benchmark_brute_force():
+    Time_grid = []
+ 
+    n_list = []
+ 
+    for N in range(1,20):
+        print(N) # pour voir que ça avance!
+        n_list.append(N)
+ 
+        # on calcule une moyenne sur N lancements en tirant aléatoirement une ville de départ à chaque fois
+        Time_grid.append(timeit(lambda: brute_force(france, list(france), N, france_distance_dict), number=1))
+        print(N,'finished')
+
+    plt.xlabel('n')
+    plt.ylabel('T')
+    plt.plot(n_list, Time_grid, 'r^', label='brute_force')
+    plt.legend()
+ 
+    plt.show()
+
+#################################################### Question 15 ###################################################
+def greedy_algorithm(map, candidates, k, distance_dict):
+    smallest_combi = set()
+    smallest_distance = math.inf
+    while len(smallest_combi) < k:
+        next_value = math.inf
+        next_ville = None
+        for i in candidates:
+            value = kcentre_value(map,smallest_combi.union({i}),distance_dict)
+            if value < next_value:
+                next_value = value
+                next_ville = i
+        
+        smallest_combi = smallest_combi.union({next_ville})
+        candidates.remove(next_ville)
+        smallest_distance = next_value
+    return (smallest_distance,smallest_combi)
+
+#################################################### Question 16 ###################################################
+def heuristic_algorithm(map, candidates, k, distance_dict, l=1):
+    smallest_combi = set()
+    smallest_distance = math.inf
+    
+    while len(smallest_combi) < k:
+        next_value = math.inf
+        next_ville = None
+        if k-len(smallest_combi) < l:
+            l = k-len(smallest_combi)
+        for i in combi_gen_k(candidates,l):
+            value = kcentre_value(map,smallest_combi.union(set(i)),distance_dict)
+            if value < next_value:
+                next_value = value
+                next_ville = set(i)
+        
+        smallest_combi = smallest_combi.union(next_ville)
+        for j in next_ville:
+            candidates.remove(j)
+        smallest_distance = next_value
+    return (smallest_distance,smallest_combi)
+#################################################### Question 17 ###################################################
+def random_algorithm(map, candidates, k, distance_dict, trials=100):
+    smallest_combi = set()
+    smallest_distance = math.inf
+
+    for _ in range(0,trials):
+        candidates_copy=candidates.copy()
+        random.shuffle(candidates_copy)
+        random_combination = candidates_copy[0:k]
+        distance = kcentre_value(map,random_combination,distance_dict)
+        if distance < smallest_distance:
+            smallest_distance = distance
+            smallest_combi = set(random_combination)
+    return (smallest_distance,smallest_combi)
+
+
+#################################################### Question 18 ###################################################
+def benchmark_all():
+    Time_brute_grid = []
+    value_brute_grid = []
+    Time_heuristic_grid=[]
+    value_heuristic_grid=[]
+    Time_greedy_grid=[]
+    value_greedy_grid=[]
+    Time_random_grid=[]
+    value_random_grid=[]
+    n_list = []
+ 
+    for N in range(1,11):
+        print(N) # pour voir que ça avance!
+        n_list.append(N)
+ 
+        # on calcule une moyenne sur N lancements en tirant aléatoirement une ville de départ à chaque fois
+        Time_brute_grid.append(timeit(lambda: value_brute_grid.append(brute_force(france, list(france), N, france_distance_dict)[0]), number=1))
+        Time_heuristic_grid.append(timeit(lambda: value_heuristic_grid.append(heuristic_algorithm(france, list(france), N, france_distance_dict, l=2)[0]), number=1))
+        Time_greedy_grid.append(timeit(lambda: value_greedy_grid.append(greedy_algorithm(france, list(france), N, france_distance_dict)[0]), number=1))
+        Time_random_grid.append(timeit(lambda: value_random_grid.append(random_algorithm(france, list(france), N, france_distance_dict, trials=100)[0]), number=1))
+        
+        print(N,'finished')
+
+    plt.subplot(2, 1, 1)
+    plt.xlabel('n')
+    plt.ylabel('T')
+    plt.plot(n_list, Time_brute_grid, 'r-', label='brute_force')
+    plt.plot(n_list, Time_heuristic_grid, 'b-', label='heuristic')
+    plt.plot(n_list, Time_greedy_grid, 'g-', label='greedy')
+    plt.plot(n_list, Time_random_grid, 'k-', label='random')
+    plt.legend()
+
+    plt.subplot(2, 1, 2)
+    plt.xlabel('n')
+    plt.ylabel('value')
+    plt.plot(n_list, value_brute_grid, 'r^', label='brute_force')
+    plt.plot(n_list, value_heuristic_grid, 'b^', label='heuristic')
+    plt.plot(n_list, value_greedy_grid, 'g^', label='greedy')
+    plt.plot(n_list, value_random_grid, 'k^', label='random')
+    plt.legend()
+    plt.show()
+
+#################################################### Question 19 ###################################################
+def france_all():
+    france = read_map('france.map')
+    france_distance_dict = all_distances(france)
+
+    Time_heuristic_grid=[]
+    value_heuristic_grid=[]
+    Time_greedy_grid=[]
+    value_greedy_grid=[]
+    Time_random_grid=[]
+    value_random_grid=[]
+    n_list = []
+ 
+    for N in range(1,11):
+        print(N) # pour voir que ça avance!
+        n_list.append(N)
+ 
+        # on calcule une moyenne sur N lancements en tirant aléatoirement une ville de départ à chaque fois
+        Time_heuristic_grid.append(timeit(lambda: value_heuristic_grid.append(heuristic_algorithm(france, list(france), N, france_distance_dict, l=2)[0]), number=1))
+        print('heuristic finished')
+        Time_greedy_grid.append(timeit(lambda: value_greedy_grid.append(greedy_algorithm(france, list(france), N, france_distance_dict)[0]), number=1))
+        print('greedy finished')
+        Time_random_grid.append(timeit(lambda: value_random_grid.append(random_algorithm(france, list(france), N, france_distance_dict, trials=100)[0]), number=1))
+        print('random finished')
+
+    plt.subplot(2, 1, 1)
+    plt.xlabel('n')
+    plt.ylabel('T')
+    plt.plot(n_list, Time_heuristic_grid, 'b-', label='heuristic')
+    plt.plot(n_list, Time_greedy_grid, 'g-', label='greedy')
+    plt.plot(n_list, Time_random_grid, 'k-', label='random')
+    plt.legend()
+
+    plt.subplot(2, 1, 2)
+    plt.xlabel('n')
+    plt.ylabel('value')
+    plt.plot(n_list, value_heuristic_grid, 'b^', label='heuristic')
+    plt.plot(n_list, value_greedy_grid, 'g^', label='greedy')
+    plt.plot(n_list, value_random_grid, 'k^', label='random')
+    plt.legend()
+    plt.show()
 ################################################# Check Functions ##################################################
 # This part is given by the professor.
 
@@ -353,6 +543,71 @@ def Q_10():
         print(combi)
     print('Question 10 Finished')
 
+def Q_11():
+    assert closest_hospital('A', ['B','E','D'], toy_distance_dict) == (140, 'B')
+    assert closest_hospital('B', ['B','E','D'], toy_distance_dict) == (0, 'B')
+    assert closest_hospital('C', ['B','E','D'], toy_distance_dict) == (260, 'B')
+    assert closest_hospital('D', ['B','E','D'], toy_distance_dict) == (0, 'D')
+    assert closest_hospital('E', ['B','E','D'], toy_distance_dict) == (0, 'E')
+    assert closest_hospital('F', ['B','E','D'], toy_distance_dict) == (120, 'E')
+    print('Question 11 Passed')
+    draw_map(toy_map, ['B','E','D'])   # visualisation, pensez à commenter cette ligne une fois testée
+
+def Q_12():
+    assert kcentre_value(toy_map, ['B','E','D'], toy_distance_dict) == 260
+    print('Question 12 Passed')
+
+def Q_13():
+    assert brute_force(toy_map, list(toy_map), 3, toy_distance_dict)[0] == 200
+    assert brute_force(toy_map, list(toy_map), 2, toy_distance_dict)[0] == 260
+    print('Question 13 toy_map test Passed')
+
+    assert brute_force(france, list(france), 1, france_distance_dict) == (828, {'Dijon'})
+    assert brute_force(france, list(france), 5, france_distance_dict) == (273, {'Dijon', 'Bordeaux', 'Rennes', 'Marseille', 'Paris'})
+    print('Question 13 french test Passed')
+    draw_map(france, {'Dijon', 'Bordeaux', 'Rennes', 'Marseille', 'Paris'}, l=1200, h=1000)
+    
+def Q_14():
+    benchmark_brute_force()
+    print('Question 14 Finished')
+
+def Q_15():
+    print(brute_force(france, list(france), 1, france_distance_dict))
+    print(greedy_algorithm(france, list(france), 1, france_distance_dict))
+    print(brute_force(france, list(france), 5, france_distance_dict))
+    print(greedy_algorithm(france, list(france), 5, france_distance_dict))
+    print('Question 15 Finished')
+
+def Q_16():
+    force_d, force_h = brute_force(france, list(france), 5, france_distance_dict)
+ 
+    greed_d, greed_h = greedy_algorithm(france, list(france), 5, france_distance_dict)
+
+    heur_d_1, heur_h_1 = heuristic_algorithm(france, list(france), 5, france_distance_dict, l=1)
+    heur_d_3, heur_h_3 = heuristic_algorithm(france, list(france), 5, france_distance_dict, l=3)
+    heur_d_5, heur_h_5 = heuristic_algorithm(france, list(france), 5, france_distance_dict, l=5)
+
+    print(force_d,force_h)
+    print(greed_d,greed_h)
+    print(heur_d_1,heur_h_1)
+    print(heur_d_3,heur_h_3)
+    print(heur_d_5,heur_h_5)
+    assert (heur_d_1, heur_h_1) == (greed_d, greed_h)
+    assert (heur_d_5, heur_h_5) == (force_d, force_h)
+
+    assert heur_d_1 >= heur_d_3 and heur_d_3 >= heur_d_5
+    print('Question 16 Passed')
+
+def Q_17():
+    print(brute_force(france, list(france), 1, france_distance_dict))
+    print(random_algorithm(france, list(france), 1, france_distance_dict))
+    print(brute_force(france, list(france), 5, france_distance_dict))
+    print(random_algorithm(france, list(france), 5, france_distance_dict))
+    print('Question 17 Finished')
+
+def Q_18():
+    benchmark_all()
+    print('Question 18 Finished')
 ####################################################### Main ########################################################
 if __name__=="__main__":
 
@@ -373,5 +628,14 @@ if __name__=="__main__":
     #Q_6()
     #Q_7()
     #Q_8()
-    Q_9()
-    Q_10()
+    #Q_9()
+    #Q_10()
+    #Q_11()
+    #Q_12()
+    #Q_13()
+    #Q_15()
+    #Q_16()
+    #Q_17()
+    #Q_18()
+    #Q_14()
+    france_all()

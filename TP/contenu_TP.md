@@ -16,4 +16,25 @@ Le contenu de TP et les listes des attentions
         Conseil: Conteur pour update  
 - Exo6: Get all combination by naive approach
 - Exo7: Get all combination of size k by naive approach
-- Exo8&9&10: Get combinations with think of graph intensive and voisin, voir code pour comprendre
+    **Attention**  
+    Usage of ```yield```
+- Exo8: Get voisins of a graph
+- Exo9: Get all of the combination possible with DFS
+- Exo10: Get all of the combination of length k with DFS
+    **Attention**  
+    Why do we use DFS?
+    How to stop once we find a combination of length k?  
+    Are pop(0) and pop(-1) of same complexity?  
+- Exo11: Get the min of the hospitals near here
+    **Attention**   
+    Usage of  ```min(hospitals, key=lambda i: distance_dict[(city,i)])``` can help to improve our code
+- Exo12: Get the max of exo11, which is the kcentre_value
+- Exo13: Write the brute force algo which tests all of the possible combinations
+- Exo14: Complexity of brute force
+- Exo15: Write greedy(glouton) algorithm which takes each time 1 best (combien with the old city) city to add in the combination
+- Exo16: Write heuristic algorithm which takes each time l best (combien with the old city) city to add in the combination
+- Exo17: Write random algorithm which takes 
+    **Attention**   
+    Usage of ```random.shuffle(candidates_copy)``` and ```random_combination = candidates_copy[0:k]``` to randomly generate a combination
+- Exo18: Complexity of france lite map
+- Exo19: Complexity of france map
